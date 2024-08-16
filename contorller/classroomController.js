@@ -167,3 +167,22 @@ module.exports.editClassroom = async (req, res, next) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+module.exports.deleteClass = async (req, res, next) => {
+  try {
+      const { classroomId } = req.params;
+      const classroom = await Classroom.findById(classroomId);
+      if (!classroom) {
+          return res.status(404).json({ message: 'Classroom not found' });
+      }
+      // teacher should not delete someone else's classroom. 
+      if (req.session.userId !== classroom.teacher.toString()) {
+          return res.status(403).json({ message: 'Access denied. You can only delete your own classrooms.' });
+      }
+      await classroom.deleteOne();
+      res.status(200).json({ message: 'Classroom deleted successfully.' });
+  } catch (error) {
+      console.error("Error deleting classroom:", error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
