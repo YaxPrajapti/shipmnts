@@ -25,8 +25,7 @@ Before you begin, ensure you have met the following requirements:
    ```bash
    git clone https://github.com/YaxPrajapti/shipmnts.git
 2. **Navigate to the project directory:**
-3. **Run:**
-4.   npm install
-5. You will need to setup .env file consist of MONGO_URI and PORT variable.
-6. Link to run service: https://shipmnts-mocha.vercel.app/
+3. **Run:** npm install
+4. You will need to setup .env file consist of MONGO_URI and PORT variable.
+
 
