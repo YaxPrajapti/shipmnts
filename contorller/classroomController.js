@@ -94,11 +94,9 @@ module.exports.assignTask = async (req, res, next) => {
     const { classroomId } = req.params;
     const { title, description, dueDate } = req.body;
     if (!title || !description || !dueDate) {
-      return res
-        .status(400)
-        .json({
-          message: "All fields are required: title, description, due date",
-        });
+      return res.status(400).json({
+        message: "All fields are required: title, description, due date",
+      });
     }
     const classroom = await Classroom.findById(classroomId);
     if (!classroom) {
@@ -110,7 +108,7 @@ module.exports.assignTask = async (req, res, next) => {
       dueDate,
       classroom: classroomId,
     });
-    const savedTask = await task.save(); 
+    const savedTask = await task.save();
     res.status(201).json({
       taskId: savedTask._id,
       title: savedTask.title,
@@ -119,6 +117,53 @@ module.exports.assignTask = async (req, res, next) => {
     });
   } catch (error) {
     console.error("Error assigning task:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+module.exports.viewClassroom = async (req, res, next) => {
+  try {
+    const { teacherId } = req.params;
+    const classrooms = await Classroom.find({ teacher: teacherId });
+    if (!classrooms || classrooms.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Teacher has not created classroom yet." });
+    }
+    res.status(200).json({
+      classrooms: classrooms.map((classroom) => ({
+        classroomId: classroom._id,
+        classroomName: classroom.name,
+        createdAt: classroom.createdAt,
+      })),
+    });
+  } catch (error) {
+    console.error("Error fetching classrooms:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+module.exports.editClassroom = async (req, res, next) => {
+  try {
+    const { classroomId } = req.params;
+    const { classroomName } = req.body;
+    if (!classroomName) {
+      return res.status(400).json({ message: "Classroom name is required" });
+    }
+    const classroom = await Classroom.findById(classroomId);
+    if (!classroom) {
+      return res.status(404).json({ message: "Classroom not found" });
+    }
+    if (req.session.userId !== classroom.teacher.toString()) {
+      return res.status(403).json({
+        message: "Access denied. You can only edit your own classrooms.",
+      });
+    }
+    classroom.name = classroomName;
+    await classroom.save();
+    res.status(200).json({ message: "Classroom updated successfully." });
+  } catch (error) {
+    console.error("Error updating classroom:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
