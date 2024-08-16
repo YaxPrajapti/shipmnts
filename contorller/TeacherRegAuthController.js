@@ -50,7 +50,7 @@ module.exports.login = async (req, res, next) => {
 
         req.session.userId = teacher._id;
         req.session.role = 'teacher';
-
+        console.log(req.session); 
         res.status(200).json({
             message: 'Logged in successfully',
             teacherId: teacher._id

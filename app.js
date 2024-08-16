@@ -10,7 +10,9 @@ const MongoStore = require("connect-mongo");
 const app = express();
 
 const authTeacher = require("./routes/teacherAuthRoute");
-const teacherRoute = require("./routes/teacherRoute")
+const authStudent = require('./routes/studentAuthRoute'); 
+const teacherRoute = require("./routes/teacherRoute");
+const classroomRoute = require('./routes/classroomRoute'); 
 
 const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT || 3000;
@@ -35,7 +37,9 @@ app.use(
 );
 
 app.use("/api/auth/teachers", authTeacher);
+app.use("/api/auth/students", authStudent);
 app.use("/teachers", teacherRoute); 
+app.use('/classrooms', classroomRoute);
 
 mongoose
   .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
